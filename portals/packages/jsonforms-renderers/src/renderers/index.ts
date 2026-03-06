@@ -12,7 +12,15 @@ import {
 } from './LayoutRenderers';
 import FileControl from './FileControl';
 import { FileControlTester } from './FileControlTester';
+import ArrayControl from './ArrayControl';
+import { ArrayControlTester } from './ArrayControlTester';
 import LabelRenderer, { LabelTester } from './LabelRenderer';
+import { rankWith, isPrimitiveArrayControl } from '@jsonforms/core';
+
+const PrimitiveArrayControlTester = rankWith(
+    3,
+    isPrimitiveArrayControl
+);
 
 export const radixRenderers = [
     { tester: TextControlTester, renderer: TextControl },
@@ -25,6 +33,8 @@ export const radixRenderers = [
     { tester: GroupLayoutTester, renderer: GroupLayoutRenderer },
     { tester: CategorizationLayoutTester, renderer: CategorizationLayoutRenderer },
     { tester: FileControlTester, renderer: FileControl },
+    { tester: ArrayControlTester, renderer: ArrayControl },
+    { tester: PrimitiveArrayControlTester, renderer: ArrayControl },
     { tester: LabelTester, renderer: LabelRenderer },
 ];
 
@@ -37,4 +47,6 @@ export * from './LayoutRenderers';
 export type { CategorizationLayoutProps };
 export { default as FileControl } from './FileControl';
 export * from './FileControlTester';
+export { default as ArrayControl } from './ArrayControl';
+export * from './ArrayControlTester';
 export * from './LabelRenderer';
