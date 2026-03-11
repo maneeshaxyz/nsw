@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
@@ -14,9 +15,9 @@ import (
 	"github.com/OpenNSW/nsw/internal/uploads/drivers"
 )
 
-// NewStorageFromConfig creates a storage instance based on the provided configuration
+// NewStorageFromConfig creates a storage instance based on the provided configuration.
 func NewStorageFromConfig(ctx context.Context, cfg config.StorageConfig) (StorageDriver, error) {
-	switch cfg.Type {
+	switch strings.TrimSpace(cfg.Type) {
 	case "local":
 		slog.Info("Initializing local storage", "dir", cfg.LocalBaseDir)
 		return drivers.NewLocalFSDriver(cfg.LocalBaseDir, cfg.LocalPublicURL)
@@ -42,6 +43,10 @@ func NewStorageFromConfig(ctx context.Context, cfg config.StorageConfig) (Storag
 				o.BaseEndpoint = aws.String(cfg.S3Endpoint)
 			}
 			o.UsePathStyle = true
+			// Allow uploads over HTTP (e.g. local MinIO) where TLS is unavailable.
+			// Without this, the SDK requires a seekable stream to compute checksums
+			// upfront, which fails when the reader has been wrapped (e.g. countingReader).
+			o.RequestChecksumCalculation = aws.RequestChecksumCalculationWhenSupported
 		})
 
 		return drivers.NewS3Driver(client, cfg.S3Bucket, cfg.S3PublicURL), nil

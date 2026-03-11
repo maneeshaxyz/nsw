@@ -10,7 +10,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-// S3Driver implements StorageDriver for S3-compatible storage
+// S3Driver implements StorageDriver for S3-compatible storage.
+// Save streams via PutObject (request body is capped at 32MB by the HTTP handler).
 type S3Driver struct {
 	Client        *s3.Client
 	PresignClient *s3.PresignClient
@@ -68,23 +69,24 @@ func (d *S3Driver) Delete(ctx context.Context, key string) error {
 	return nil
 }
 
-func (d *S3Driver) GenerateURL(ctx context.Context, key string, expires time.Duration) (string, error) {
-	if d.PublicURL != "" {
-		return fmt.Sprintf("%s/%s", d.PublicURL, key), nil
+// presignGet returns a presigned GET URL for the key; used by both GenerateURL and GetDownloadURL.
+func (d *S3Driver) presignGet(ctx context.Context, key string, ttl time.Duration) (string, error) {
+	if ttl == 0 {
+		ttl = time.Hour
 	}
-
-	// Fallback to presigned URL
-	if expires == 0 {
-		expires = time.Hour
-	}
-
 	presignedReq, err := d.PresignClient.PresignGetObject(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(d.Bucket),
 		Key:    aws.String(key),
-	}, s3.WithPresignExpires(expires))
-
+	}, s3.WithPresignExpires(ttl))
 	if err != nil {
 		return "", fmt.Errorf("failed to presign URL: %w", err)
 	}
 	return presignedReq.URL, nil
+}
+
+func (d *S3Driver) GetDownloadURL(ctx context.Context, key string, ttl time.Duration) (string, error) {
+	if ttl == 0 {
+		ttl = 15 * time.Minute
+	}
+	return d.presignGet(ctx, key, ttl)
 }
