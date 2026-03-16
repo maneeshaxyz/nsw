@@ -40,34 +40,24 @@ configurations:
           name: nsw-db-secrets
           key: database
     - name: DB_SSLMODE
-      value: require
+      value: disable
+    # Server
+    - name: SERVER_PORT
+      value: "8080"
+    - name: SERVICE_URL
+      value: http://localhost:8080
     # Auth
     - name: AUTH_JWKS_URL
-      valueFrom:
-        secretKeyRef:
-          name: nsw-auth-secrets
-          key: jwks-url
+      value: https://localhost:8090/oauth2/jwks
     - name: AUTH_ISSUER
-      valueFrom:
-        secretKeyRef:
-          name: nsw-auth-secrets
-          key: issuer
+      value: https://localhost:8090
     - name: AUTH_CLIENT_ID
-      valueFrom:
-        secretKeyRef:
-          name: nsw-auth-secrets
-          key: client-id
+      value: TRADER_PORTAL_APP
     - name: AUTH_AUDIENCE
-      valueFrom:
-        secretKeyRef:
-          name: nsw-auth-secrets
-          key: audience
+      value: TRADER_PORTAL_APP
     # CORS
     - name: CORS_ALLOWED_ORIGINS
-      valueFrom:
-        secretKeyRef:
-          name: nsw-backend-secrets
-          key: cors-allowed-origins
+      value: http://localhost:3000,http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176
     # Storage
     - name: STORAGE_TYPE
       value: local
