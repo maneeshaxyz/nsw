@@ -1,29 +1,29 @@
-# Use the official migrate image to extract the binary
-# Always pin a specific version for production immutability
-FROM migrate/migrate:v4.17.0 AS migrate-bin
+# Build execution image
+FROM alpine:3.20
 
-# Build the execution image
-FROM alpine:3.18
+ARG MIGRATE_VERSION=v4.17.0
 
-# Install postgres-client (for pg_isready checks) and CA certs
-RUN apk add --no-cache ca-certificates postgresql-client
+RUN apk add --no-cache \
+    ca-certificates \
+    postgresql-client \
+    curl \
+    tar
 
-# OPENSHIFT COMPLIANCE: Use UID 1001 and Group 0
-# OpenShift will override the UID dynamically, but it relies on GID 0 permissions
+# OPENSHIFT COMPLIANCE: UID 1001, GID 0
 RUN adduser -D -u 1001 -G root -s /bin/false migrate
 
 WORKDIR /migrations
 
-# Ensure the root group (GID 0) has access to the app directory
+# Install migrate binary directly (no upstream image)
+RUN curl -L https://github.com/golang-migrate/migrate/releases/download/${MIGRATE_VERSION}/migrate.linux-amd64.tar.gz \
+    | tar xvz \
+ && mv migrate /usr/local/bin/migrate \
+ && chmod +x /usr/local/bin/migrate
+
+# Copy SQL migrations
+COPY backend/internal/database/migrations/*.sql ./
+
 RUN chgrp -R 0 /migrations && \
     chmod -R g+rwX /migrations
 
-# Copy migration binary from the builder stage
-# (Note: The official image places it at /migrate, not /usr/bin/migrate)
-COPY --from=migrate-bin /migrate /usr/local/bin/migrate
-
-# Copy SQL scripts (Assuming Docker build context is the repository root)
-COPY backend/internal/database/migrations/*.sql ./
-
-# Set to the non-root user
 USER 1001
