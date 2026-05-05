@@ -19,8 +19,6 @@ RUN pnpm --filter oga-app... build
 
 FROM nginx:1.30-alpine
 
-RUN apk --no-cache upgrade
-
 LABEL org.opencontainers.image.source="https://github.com/OpenNSW/nsw"
 LABEL org.opencontainers.image.description="NSW OGA Officer Portal Frontend"
 
