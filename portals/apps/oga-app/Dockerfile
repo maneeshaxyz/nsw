@@ -22,7 +22,7 @@ COPY . .
 # Build including dependencies
 RUN pnpm --filter oga-app... build
 
-FROM nginxinc/nginx-unprivileged:1.27-alpine
+FROM nginxinc/nginx-unprivileged:stable-alpine3.23-perl
 
 LABEL org.opencontainers.image.source="https://github.com/OpenNSW/nsw"
 LABEL org.opencontainers.image.description="NSW OGA Officer Portal Frontend"
