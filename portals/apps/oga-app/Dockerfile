@@ -17,7 +17,7 @@ COPY . .
 # Build oga-app and any workspace dependencies it relies on (e.g. local packages/*).
 RUN pnpm --filter oga-app... build
 
-FROM nginx:1.30.0-alpine
+FROM nginxinc/nginx-unprivileged:1.30-alpine
 
 LABEL org.opencontainers.image.source="https://github.com/OpenNSW/nsw"
 LABEL org.opencontainers.image.description="NSW OGA Officer Portal Frontend"
