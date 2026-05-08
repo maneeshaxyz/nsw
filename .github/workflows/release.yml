@@ -228,7 +228,7 @@ jobs:
           sarif_file: trivy-${{ matrix.image_name }}.sarif
 
       - name: Print Trivy findings (debug)
-        if: always()
+        if: always() && steps.trivy-scan.outcome != 'skipped'
         run: |
           trivy image \
             --severity HIGH,CRITICAL \
