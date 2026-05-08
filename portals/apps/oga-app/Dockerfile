@@ -8,7 +8,6 @@ RUN corepack enable
 
 # Copy workspace manifests
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
-COPY apps/trader-app/package.json apps/trader-app/package.json
 COPY apps/oga-app/package.json apps/oga-app/package.json
 COPY packages/jsonforms-renderers/package.json packages/jsonforms-renderers/package.json
 COPY packages/ui/package.json packages/ui/package.json

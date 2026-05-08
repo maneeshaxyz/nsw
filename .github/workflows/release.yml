@@ -200,7 +200,6 @@ jobs:
           retention-days: 1
 
       # Trivy scans the pushed image for CRITICAL/HIGH CVEs.
-      # continue-on-error keeps the release moving if Trivy itself fails.
       - name: Setup Trivy
         if: steps.release-mode.outputs.enabled == 'true'
         uses: aquasecurity/setup-trivy@e6c2c5e321ed9123bda567646e2f96565e34abe1
